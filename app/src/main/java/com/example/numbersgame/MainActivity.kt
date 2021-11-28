@@ -19,13 +19,11 @@ class MainActivity : AppCompatActivity() {
     private  lateinit var textFiled : EditText
     private lateinit var clMain : ConstraintLayout
     private var userGusses = ArrayList<String>()
-    private var rounds = 0
-    var theWinningNum = 0
+    private var rounds = 3
+    private var theWinningNum =  Random.nextInt(1, 16)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        theWinningNum = Random.nextInt(1, 16)
-        rounds = 3
         userGusses = arrayListOf()
         clMain = findViewById(R.id.clMain)
         rvMain = findViewById(R.id.rvMain)
@@ -61,6 +59,18 @@ class MainActivity : AppCompatActivity() {
             rvMain.adapter?.notifyDataSetChanged()
 
         }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("myWinningNumber", theWinningNum)
+        outState.putStringArrayList("usersGuesses", userGusses)
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        theWinningNum = savedInstanceState.getInt("myWinningNumber")
+        userGusses = savedInstanceState.getStringArrayList("usersGuesses") as ArrayList<String>
+        rvMain.adapter = RecycleViewAdapter(userGusses)
+
     }
     private fun NumaricValidation(input:String): Int {
         return try {
@@ -104,6 +114,8 @@ class MainActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.restartItem -> {
                 Snackbar.make(clMain, "New Game !", Snackbar.LENGTH_SHORT).show()
+                rounds = 3
+                theWinningNum =  Random.nextInt(1, 16)
                 this.recreate()
                 return true
             }
